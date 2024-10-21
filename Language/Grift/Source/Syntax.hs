@@ -102,7 +102,8 @@ data Type t =
 deriving instance (Show a, Show t) => Show (BindF t (Ann a (ExpF t)))
 deriving instance (Show a, Show t) => Show (ExpF t (Ann a (ExpF t)))
 
-instance (MeetSemiLattice t, Show t) => MeetSemiLattice (Type t) where
+instance (Lattice t, Show t) => Lattice (Type t) where
+  -- meet
   Dyn /\ t                           = t
   t /\ Dyn                           = t
   CharTy /\ CharTy                   = CharTy
@@ -124,7 +125,7 @@ instance (MeetSemiLattice t, Show t) => MeetSemiLattice (Type t) where
   t1 /\ t2                             =
     error ("/\\: undefined on " ++ show t1 ++ " and " ++ show t2)
 
-instance (JoinSemiLattice t, Show t) => JoinSemiLattice (Type t) where
+  -- join
   Dyn \/ _                           = Dyn
   _ \/ Dyn                           = Dyn
   CharTy \/ CharTy                   = CharTy
@@ -146,7 +147,5 @@ instance (JoinSemiLattice t, Show t) => JoinSemiLattice (Type t) where
   t1 \/ t2                           =
     error ("\\/: undefined on " ++ show t1 ++ " and " ++ show t2)
 
-instance (JoinSemiLattice t, MeetSemiLattice t, Show t) => Lattice (Type t) where
-
-(⊑) :: (Eq t, Show t, JoinSemiLattice t) => Type t -> Type t -> Bool
+(⊑) :: (Eq t, Show t, Lattice t) => Type t -> Type t -> Bool
 (⊑) = joinLeq
